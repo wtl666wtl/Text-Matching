@@ -47,10 +47,12 @@ def main():
     train_text2 = []
     test_text = []
     test_text2 = []
-    for id, t1, t2 in reader:
+    label = []
+    for id, t1, t2, l in reader:
         if not id.isalpha():
             train_text.append(t1)
             train_text2.append(t2)
+            label.append(l)
     reader = csv.reader(open("test.tsv","r",encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
@@ -58,7 +60,7 @@ def main():
             test_text2.append(t2)
 
     test_set = TextDataset(test=True, text=test_text, text2=test_text2)
-    train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=labeled_label)
+    train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=label)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                                  num_workers=4, drop_last=True)
