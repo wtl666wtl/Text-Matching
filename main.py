@@ -1,5 +1,4 @@
 import random
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -66,19 +65,19 @@ def main():
         label.append(1)
     for i in range(n):
         a = random.random()
-        x = random.randint(0, n-1)
+        x = random.randint(0, n - 1)
         if a < 0.5:
             train_text.append(train_text[x])
         else:
             train_text.append(train_text2[x])
         a = random.random()
-        y = random.randint(0, n-1)
-        while x==y:
-            y=random.randint(0, n-1)
+        y = random.randint(0, n - 1)
+        while x == y:
+            y = random.randint(0, n - 1)
         if a < 0.5:
-            train_text.append(train_text[y])
+            train_text2.append(train_text[y])
         else:
-            train_text.append(train_text2[y])
+            train_text2.append(train_text2[y])
         label.append(0)
     reader = csv.reader(open("test.tsv", "r", encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
