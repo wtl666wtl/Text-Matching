@@ -68,6 +68,7 @@ def main():
     model = Bert_model(2).to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-5)
     criterion = nn.CrossEntropyLoss().to(device)
+    print("Start training!")
 
     # train
     batch_count = len(train_text) // batch_size
