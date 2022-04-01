@@ -68,7 +68,7 @@ def main():
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(5):
+    for epoch in range(0):
         print_avg_loss = 0
         for batch_idx, ((x, mx, x2, mx2), label) in enumerate(train_loader):
             x = x.to(device)
