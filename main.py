@@ -86,6 +86,7 @@ def main():
 
     # test
     model.eval()
+    preds = np.array([])
     with torch.no_grad():
         for batch_idx, ((x, mx, x2, mx2), _) in enumerate(test_loader):
             x = x.to(device)
