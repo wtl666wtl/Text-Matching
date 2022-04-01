@@ -105,8 +105,8 @@ def main():
     preds = preds.astype(int)
 
     # output
-    writer = csv.writer(open("submission.csv","r",encoding="utf-8"))
-    writer.writerow(("Id","Category"))
+    writer = csv.writer(open("submission.csv","w",encoding="utf-8"))
+    writer.writerow(("Id", "Category"))
     for i in range(len(preds)):
         writer.writerow((i, preds[i]))
 
