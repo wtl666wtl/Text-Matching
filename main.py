@@ -61,14 +61,14 @@ def main():
                                                num_workers=4, drop_last=True)
     device = torch.device('cuda')
     model = Bert_model(2).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=5e-5)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(0):
+    for epoch in range(5):
         print_avg_loss = 0
         for batch_idx, ((x, mx, x2, mx2), label) in enumerate(train_loader):
             x = x.to(device)
