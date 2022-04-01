@@ -19,6 +19,6 @@ class Bert_model(nn.Module):
     def forward(self, input_ids, attention_mask, input_ids2, attention_mask2):
         _, pooled = self.bert(input_ids, attention_mask=attention_mask)
         _, pooled2 = self.bert(input_ids2, attention_mask=attention_mask2)
-        tmp = (pooled, pooled2)
+        tmp = torch.cat((pooled, pooled2), 0)
         linear_output = self.dense(tmp)
         return linear_output, tmp
