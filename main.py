@@ -52,7 +52,7 @@ def main():
         if not id.isalpha():
             train_text.append(t1)
             train_text2.append(t2)
-            label.append(l)
+            label.append(int(l))
     reader = csv.reader(open("test.tsv","r",encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
