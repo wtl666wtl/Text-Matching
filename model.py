@@ -1,9 +1,6 @@
 import torch
 from torch import nn
-from torch import optim
 import transformers as tfs
-import math
-import numpy as np
 
 model_class, tokenizer_class, pretrained_weights = (tfs.BertModel, tfs.BertTokenizerFast, 'bert-base-uncased')
 tokenizer = tokenizer_class.from_pretrained(pretrained_weights)
