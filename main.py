@@ -93,7 +93,6 @@ def main():
             mx = mx.to(device)
             x2 = x2.to(device)
             mx2 = mx2.to(device)
-            label = label.to(device)
             output, _ = model(x, mx, x2, mx2)
             prob = F.softmax(output, dim=1)
             conf, pred = prob.max(1)
