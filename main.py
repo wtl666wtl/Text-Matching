@@ -14,22 +14,19 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 class TextDataset(Dataset):
     def __init__(self, test, text, text2, label=None):
         self.test = test
-        self.text2 = text2
-        self.text = text
         self.label = label
-        self.batch_tokenized = tokenizer.batch_encode_plus(text, add_special_tokens=True,
+        tmp = []
+        for i in range(len(text)):
+            tmp.append((text[i], text2[i]))
+        self.batch_tokenized = tokenizer.batch_encode_plus(tmp, add_special_tokens=True,
                                                            max_length=64, truncation=True, pad_to_max_length=True)
-        self.batch_tokenized2 = tokenizer.batch_encode_plus(text2, add_special_tokens=True,
-                                                            max_length=64, truncation=True, pad_to_max_length=True)
 
     def __len__(self):
         return len(self.text)
 
     def __getitem__(self, item):
         text = (torch.tensor(self.batch_tokenized["input_ids"][item]),
-                torch.tensor(self.batch_tokenized["attention_mask"][item]),
-                torch.tensor(self.batch_tokenized2["input_ids"][item]),
-                torch.tensor(self.batch_tokenized2["attention_mask"][item]))
+                torch.tensor(self.batch_tokenized["attention_mask"][item]))
         if not self.test:
             return text, self.label[item]
         else:
@@ -52,22 +49,6 @@ def main():
             train_text.append(t2)
             train_text2.append(t1)
             label.append(int(l))
-    #for i in range(n):
-    #    a = random.random()
-    #    x = random.randint(0, n - 1)
-    #    if a < 0.5:
-    #        train_text.append(train_text[x])
-    #    else:
-    #        train_text.append(train_text2[x])
-    #    a = random.random()
-    #    y = random.randint(0, n - 1)
-    #    while x == y:
-    #        y = random.randint(0, n - 1)
-    #    if a < 0.5:
-    #        train_text2.append(train_text[y])
-    #    else:
-    #        train_text2.append(train_text2[y])
-    #    label.append(0)
     reader = csv.reader(open("test.tsv", "r", encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
@@ -88,7 +69,7 @@ def main():
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(10):
+    for epoch in range(5):
         print_avg_loss = 0
         for batch_idx, ((x, mx, x2, mx2), label) in enumerate(train_loader):
             x = x.to(device)
