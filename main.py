@@ -49,36 +49,25 @@ def main():
             train_text.append(t1)
             train_text2.append(t2)
             label.append(int(l))
-    n = len(train_text)
-    for i in range(n):
-        if label[i] == 1:
-            train_text.append(train_text2[i])
-            train_text2.append(train_text[i])
-        else:
-            a = random.random()
-            if a < 0.5:
-                train_text.append(train_text[i])
-                train_text2.append(train_text[i])
-            else:
-                train_text.append(train_text2[i])
-                train_text2.append(train_text2[i])
-        label.append(1)
-    for i in range(n):
-        a = random.random()
-        x = random.randint(0, n - 1)
-        if a < 0.5:
-            train_text.append(train_text[x])
-        else:
-            train_text.append(train_text2[x])
-        a = random.random()
-        y = random.randint(0, n - 1)
-        while x == y:
-            y = random.randint(0, n - 1)
-        if a < 0.5:
-            train_text2.append(train_text[y])
-        else:
-            train_text2.append(train_text2[y])
-        label.append(0)
+            train_text.append(t2)
+            train_text2.append(t1)
+            label.append(int(l))
+    #for i in range(n):
+    #    a = random.random()
+    #    x = random.randint(0, n - 1)
+    #    if a < 0.5:
+    #        train_text.append(train_text[x])
+    #    else:
+    #        train_text.append(train_text2[x])
+    #    a = random.random()
+    #    y = random.randint(0, n - 1)
+    #    while x == y:
+    #        y = random.randint(0, n - 1)
+    #    if a < 0.5:
+    #        train_text2.append(train_text[y])
+    #    else:
+    #        train_text2.append(train_text2[y])
+    #    label.append(0)
     reader = csv.reader(open("test.tsv", "r", encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
@@ -92,7 +81,7 @@ def main():
                                                num_workers=4, drop_last=True)
     device = torch.device('cuda')
     model = Bert_model(2).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=5e-5)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
