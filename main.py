@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import csv
 
-batch_size = 256
+batch_size = 128
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
