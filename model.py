@@ -13,7 +13,7 @@ class Bert_model(nn.Module):
             param.requires_grad = True
         self.dense = nn.Linear(768, k)
 
-    def forward(self, input_ids, attention_mask):
-        _, pooled = self.bert(input_ids, attention_mask=attention_mask)
+    def forward(self, input_ids, attention_mask, token_type_ids):
+        _, pooled = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         linear_output = self.dense(pooled)
         return linear_output, pooled
