@@ -25,7 +25,7 @@ class TextDataset(Dataset):
         t1 = self.text[item]
         t2 = self.text2[item]
         encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                        max_length=64, truncation='longest_first',
+                                        max_length=64, truncation=True,
                                         pad_to_max_length=True, return_tensors='pt')
         text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
                 encode['token_type_ids'].squeeze(0))
