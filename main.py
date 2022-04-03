@@ -15,18 +15,20 @@ class TextDataset(Dataset):
     def __init__(self, test, text, text2, label=None):
         self.test = test
         self.label = label
-        tmp = []
-        for i in range(len(text)):
-            tmp.append((text[i], text2[i]))
-        self.batch_tokenized = tokenizer.batch_encode_plus(tmp, add_special_tokens=True,
-                                                           max_length=64, truncation=True, pad_to_max_length=True)
+        self.text = text
+        self.text2 = text2
 
     def __len__(self):
         return len(self.text)
 
     def __getitem__(self, item):
-        text = (torch.tensor(self.batch_tokenized["input_ids"][item]),
-                torch.tensor(self.batch_tokenized["attention_mask"][item]))
+        t1 = self.text[item]
+        t2 = self.text2[item]
+        encode = tokenizer.encode(t1, t2, add_special_tokens=True,
+                                        max_length=64, truncation='longest_first',
+                                        pad_to_max_length=True, return_tensors='pt')
+        text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
+                encode['token_type_ids'].squeeze(0))
         if not self.test:
             return text, self.label[item]
         else:
@@ -71,14 +73,13 @@ def main():
     model.train()
     for epoch in range(5):
         print_avg_loss = 0
-        for batch_idx, ((x, mx, x2, mx2), label) in enumerate(train_loader):
+        for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
             x = x.to(device)
             mx = mx.to(device)
-            x2 = x2.to(device)
-            mx2 = mx2.to(device)
+            tx = tx.to(device)
             label = label.to(device)
             optimizer.zero_grad()
-            outputs, _ = model(x, mx, x2, mx2)
+            outputs, _ = model(x, mx, tx)
             loss = criterion(outputs, label)
             loss.backward()
             optimizer.step()
@@ -89,12 +90,11 @@ def main():
     model.eval()
     preds = np.array([])
     with torch.no_grad():
-        for batch_idx, ((x, mx, x2, mx2), _) in enumerate(test_loader):
+        for batch_idx, ((x, mx, tx), _) in enumerate(test_loader):
             x = x.to(device)
             mx = mx.to(device)
-            x2 = x2.to(device)
-            mx2 = mx2.to(device)
-            output, _ = model(x, mx, x2, mx2)
+            tx = tx.to(device)
+            output, _ = model(x, mx, tx)
             prob = F.softmax(output, dim=1)
             conf, pred = prob.max(1)
             preds = np.append(preds, pred.cpu().numpy())
