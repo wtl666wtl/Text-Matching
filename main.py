@@ -24,12 +24,12 @@ class TextDataset(Dataset):
     def __getitem__(self, item):
         t1 = self.text[item]
         t2 = self.text2[item]
-        if len(t1) > 60:
-            t1 = t1[:60]
-        if len(t2) > 60:
-            t2 = t2[:60]
+        if len(t1) > 200:
+            t1 = t1[:200]
+        if len(t2) > 200:
+            t2 = t2[:200]
         encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                        max_length=64, truncation='longest_first',
+                                        max_length=256, truncation='longest_first',
                                         pad_to_max_length=True, return_tensors='pt')
         text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
                 encode['token_type_ids'].squeeze(0))
@@ -75,7 +75,7 @@ def main():
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(5):
+    for epoch in range(10):
         print_avg_loss = 0
         for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
             x = x.to(device)
