@@ -26,8 +26,9 @@ class TextDataset(Dataset):
         return len(self.text)
 
     def __getitem__(self, item):
-        t1 = self.text[item]
-        t2 = self.text2[item]
+        t1 = self.text[item].strip().split(" ")
+        t2 = self.text2[item].strip().split(" ")
+
         if len(t1) > 64:
             t1 = t1[:64]
         if len(t2) > 64:
