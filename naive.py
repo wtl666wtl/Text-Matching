@@ -40,9 +40,9 @@ class TextDataset(Dataset):
                 w1 = glove.unk_init
                 w2 = glove.unk_init
                 if i < len(t1):
-                    w1 = glove.vectors[glove.stoi[t1[i]]]
+                    w1 = glove.vectors[glove.stoi[t1[i].lower()]]
                 if j < len(t2):
-                    w2 = glove.vectors[glove.stoi[t2[i]]]
+                    w2 = glove.vectors[glove.stoi[t2[i].lower()]]
                 a[i].append((w1 * w2))
 
         text = torch.Tensor(a)
