@@ -10,14 +10,14 @@ class naive_model(nn.Module):
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
         self.mp = nn.MaxPool2d(2)
         self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(16 * 6 * 6, 256)
-        self.fc2 = nn.Linear(256, 64)
-        self.fc3 = nn.Linear(64, 2)
+        self.fc1 = nn.Linear(16 * 6 * 6, 128)
+        self.fc2 = nn.Linear(128, 32)
+        self.fc3 = nn.Linear(32, 2)
 
     def forward(self, x):
         #print(x.size())
         in_size = x.size(0)
-        x = x.unsqueeze(1) # 128 * 1 * 32 * 32
+        x = x.unsqueeze(1) # 256 * 1 * 32 * 32
         #print(x.size())
         out = self.relu(self.mp(self.conv1(x))) # 1 * 32 * 32 -> 6 * 16 * 16
         out = self.relu(self.mp(self.conv2(out))) # 6 * 16 * 16 -> 16 * 6 * 6
