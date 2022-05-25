@@ -77,13 +77,11 @@ def main():
     model.train()
     for epoch in range(10):
         print_avg_loss = 0
-        for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
+        for batch_idx, (x, label) in enumerate(train_loader):
             x = x.to(device)
-            mx = mx.to(device)
-            tx = tx.to(device)
             label = label.to(device)
             optimizer.zero_grad()
-            outputs, _ = model(x, mx, tx)
+            outputs, _ = model(x)
             loss = criterion(outputs, label)
             loss.backward()
             optimizer.step()
@@ -94,11 +92,9 @@ def main():
     model.eval()
     preds = np.array([])
     with torch.no_grad():
-        for batch_idx, ((x, mx, tx), _) in enumerate(test_loader):
+        for batch_idx, (x, _) in enumerate(test_loader):
             x = x.to(device)
-            mx = mx.to(device)
-            tx = tx.to(device)
-            output, _ = model(x, mx, tx)
+            output, _ = model(x)
             prob = F.softmax(output, dim=1)
             conf, pred = prob.max(1)
             preds = np.append(preds, pred.cpu().numpy())
