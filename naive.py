@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import csv
 import torchtext.vocab as vocab
-from utils import *
+from util import *
 
 cache_dir = '.vector_cache/glove'
 glove = vocab.GloVe(name='6B', dim=300, cache=cache_dir)
