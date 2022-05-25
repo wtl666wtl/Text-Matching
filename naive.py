@@ -81,7 +81,7 @@ def main():
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                                num_workers=4, drop_last=True)
-    device = torch.device('cpu')
+    device = torch.device('cuda')
     model = naive_model().to(device)
     optimizer = optim.Adam(model.parameters(), lr=5e-5)
     criterion = nn.CrossEntropyLoss().to(device)
