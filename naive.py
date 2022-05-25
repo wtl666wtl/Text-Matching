@@ -39,9 +39,9 @@ class TextDataset(Dataset):
             for j in range(64):
                 w1 = glove.vectors[glove.stoi["unk"]]
                 w2 = glove.vectors[glove.stoi["unk"]]
-                if i < len(t1):
+                if i < len(t1) and t1[i] in glove.stoi:
                     w1 = glove.vectors[glove.stoi[t1[i].lower()]]
-                if j < len(t2):
+                if j < len(t2) and t2[j] in glove.stoi:
                     w2 = glove.vectors[glove.stoi[t2[j].lower()]]
                 a[i].append(torch.sum(w1 * w2).item())
 
