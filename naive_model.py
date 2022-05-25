@@ -17,7 +17,7 @@ class naive_model(nn.Module):
     def forward(self, x):
         #print(x.size())
         in_size = x.size(0)
-        x = x.unsqueeze(1) # 256 * 1 * 32 * 32
+        x = x.unsqueeze(1) # 1024 * 1 * 32 * 32
         #print(x.size())
         out = self.relu(self.mp(self.conv1(x))) # 1 * 32 * 32 -> 6 * 16 * 16
         out = self.relu(self.mp(self.conv2(out))) # 6 * 16 * 16 -> 16 * 6 * 6

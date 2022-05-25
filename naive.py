@@ -12,7 +12,7 @@ from util import *
 cache_dir = '.vector_cache/glove'
 glove = vocab.GloVe(name='6B', dim=300, cache=cache_dir)
 
-batch_size = 256
+batch_size = 1024
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 L = 32
@@ -101,7 +101,6 @@ def main():
             loss.backward()
             optimizer.step()
             print_avg_loss += loss.item()
-            print("OK")
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
 
     # test
