@@ -95,7 +95,7 @@ def main():
             x = x.to(device)
             label = label.to(device)
             optimizer.zero_grad()
-            outputs, _ = model(x)
+            outputs = model(x)
             loss = criterion(outputs, label)
             loss.backward()
             optimizer.step()
@@ -108,7 +108,7 @@ def main():
     with torch.no_grad():
         for batch_idx, (x, _) in enumerate(test_loader):
             x = x.to(device)
-            output, _ = model(x)
+            output = model(x)
             prob = F.softmax(output, dim=1)
             conf, pred = prob.max(1)
             preds = np.append(preds, pred.cpu().numpy())
