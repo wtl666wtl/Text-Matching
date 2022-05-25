@@ -15,6 +15,7 @@ glove = vocab.GloVe(name='6B', dim=300, cache=cache_dir)
 batch_size = 128
 torch.multiprocessing.set_sharing_strategy('file_system')
 
+
 class TextDataset(Dataset):
     def __init__(self, test, text, text2, label=None):
         self.test = test
@@ -76,6 +77,7 @@ def main():
 
     test_set = TextDataset(test=True, text=test_text, text2=test_text2)
     train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=label)
+    print("...")
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                                num_workers=4, drop_last=True)
