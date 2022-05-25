@@ -15,6 +15,7 @@ glove = vocab.GloVe(name='6B', dim=300, cache=cache_dir)
 batch_size = 128
 torch.multiprocessing.set_sharing_strategy('file_system')
 
+L = 32
 
 class TextDataset(Dataset):
     def __init__(self, test, text, text2, label=None):
@@ -30,14 +31,14 @@ class TextDataset(Dataset):
         t1 = tokenizer(self.text[item])
         t2 = tokenizer(self.text2[item])
 
-        if len(t1) > 64:
-            t1 = t1[:64]
-        if len(t2) > 64:
-            t2 = t2[:64]
+        if len(t1) > L:
+            t1 = t1[:L]
+        if len(t2) > L:
+            t2 = t2[:L]
 
-        a = [[] for _ in range(64)]
-        for i in range(64):
-            for j in range(64):
+        a = [[] for _ in range(L)]
+        for i in range(L):
+            for j in range(L):
                 w1 = glove.vectors[glove.stoi["unk"]]
                 w2 = glove.vectors[glove.stoi["unk"]]
                 if i < len(t1) and t1[i] in glove.stoi:
