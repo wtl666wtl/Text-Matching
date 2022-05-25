@@ -37,8 +37,8 @@ class TextDataset(Dataset):
         a = [[] for _ in range(64)]
         for i in range(64):
             for j in range(64):
-                w1 = glove.vectors["unk"]
-                w2 = glove.vectors["unk"]
+                w1 = glove.vectors[glove.stoi["unk"]]
+                w2 = glove.vectors[glove.stoi["unk"]]
                 if i < len(t1):
                     w1 = glove.vectors[glove.stoi[t1[i].lower()]]
                 if j < len(t2):
