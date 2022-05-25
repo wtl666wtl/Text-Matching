@@ -77,12 +77,13 @@ def main():
 
     test_set = TextDataset(test=True, text=test_text, text2=test_text2)
     train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=label)
-    print("...")
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                                num_workers=4, drop_last=True)
+    print("...")
     device = torch.device('cuda')
     model = naive_model().to(device)
+    print("...")
     optimizer = optim.Adam(model.parameters(), lr=5e-5)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
