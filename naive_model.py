@@ -5,7 +5,7 @@ import transformers as tfs
 
 class naive_model(nn.Module):
     def __init__(self):
-        super(naive_model, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5, padding=2)
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
         self.mp = nn.MaxPool2d(2)
