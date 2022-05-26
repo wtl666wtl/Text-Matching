@@ -83,7 +83,7 @@ def main():
                                                num_workers=4, drop_last=True)
     device = torch.device('cuda')
     model = naive_model().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=5e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
