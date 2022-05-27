@@ -24,12 +24,12 @@ class TextDataset(Dataset):
     def __getitem__(self, item):
         t1 = self.text[item]
         t2 = self.text2[item]
-        if len(t1) > 100:
-            t1 = t1[:100]
-        if len(t2) > 100:
-            t2 = t2[:100]
+        if len(t1) > 200:
+            t1 = t1[:200]
+        if len(t2) > 200:
+            t2 = t2[:200]
         encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                        max_length=128, truncation='longest_first',
+                                        max_length=256, truncation='longest_first',
                                         pad_to_max_length=True, return_tensors='pt')
         text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
                 encode['token_type_ids'].squeeze(0))
@@ -55,6 +55,18 @@ def main():
             train_text.append(t2)
             train_text2.append(t1)
             label.append(int(l))
+            train_text.append(t1)
+            train_text2.append(t1)
+            label.append(1)
+            train_text.append(t2)
+            train_text2.append(t2)
+            label.append(1)
+            train_text.append(t1)
+            train_text2.append(train_text2[random.randint(0, len(train_text2)-4)])
+            label.append(0)
+            train_text.append(t2)
+            train_text2.append(train_text[random.randint(0, len(train_text)-5)])
+            label.append(0)
     reader = csv.reader(open("test.tsv", "r", encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
@@ -65,7 +77,7 @@ def main():
     train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=label)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
-                                               num_workers=4, drop_last=True)
+                                               num_workers=8, drop_last=True)
     device = torch.device('cuda')
     model = Bert_model(2).to(device)
     optimizer = optim.Adam(model.parameters(), lr=5e-5)
