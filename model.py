@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import transformers as tfs
 
-model_class, tokenizer_class, pretrained_weights = (tfs.BertModel, tfs.BertTokenizerFast, 'bert-base-cased')
+model_class, tokenizer_class, pretrained_weights = (tfs.BertModel, tfs.BertTokenizerFast, 'bert-large-cased')
 tokenizer = tokenizer_class.from_pretrained(pretrained_weights)
 
 class Bert_model(nn.Module):
