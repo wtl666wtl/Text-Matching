@@ -11,9 +11,8 @@ class Bert_model(nn.Module):
         self.bert = model_class.from_pretrained(pretrained_weights)
         for param in self.bert.parameters():
             param.requires_grad = True
-        self.dropout = nn.Dropout(p=0.1)
-        self.dense1 = nn.Linear(768, 128)
-        self.dense2 = nn.Linear(128, k)
+        self.dropout = nn.Dropout(p=0.2)
+        self.dense2 = nn.Linear(768, k)
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         _, pooled = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)

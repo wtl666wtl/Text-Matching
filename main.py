@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import csv
 
-batch_size = 128
+batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
@@ -87,7 +87,7 @@ def main():
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(10):
+    for epoch in range(3):
         print_avg_loss = 0
         for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
             x = x.to(device)
