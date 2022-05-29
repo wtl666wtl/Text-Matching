@@ -2,8 +2,7 @@ import random
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-#from model import *
-from RoBERTa import *
+from CoSent import *
 import numpy as np
 from torch.utils.data import Dataset
 import csv
@@ -30,14 +29,24 @@ class TextDataset(Dataset):
         if len(t2) > 200:
             t2 = t2[:200]
         encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                       max_length=256, truncation='longest_first',
-                                       pad_to_max_length=True, return_tensors='pt')
+                                        max_length=256, truncation='longest_first',
+                                        pad_to_max_length=True, return_tensors='pt')
         text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
                 encode['token_type_ids'].squeeze(0))
         if not self.test:
             return text, self.label[item]
         else:
             return text, []
+
+
+def compute_sim(y_pred1, y_pred2):
+    norms = (y_pred1 ** 2).sum(axis=1, keepdims=True) ** 0.5
+    y_pred1 = y_pred1 / norms
+    norms = (y_pred2 ** 2).sum(axis=1, keepdims=True) ** 0.5
+    y_pred2 = y_pred2 / norms
+
+    sim = torch.sum(y_pred1 * y_pred2, dim=1)
+    return sim
 
 
 def main():
@@ -82,8 +91,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                                num_workers=8, drop_last=True)
     device = torch.device('cuda')
-    model = RoBERTa_model(2).to(device)
-    #model = Bert_model(2).to(device)
+    model = CoSent().to(device)
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
