@@ -30,8 +30,8 @@ class TextDataset(Dataset):
         if len(t2) > 200:
             t2 = t2[:200]
         encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                        max_length=256, truncation='longest_first',
-                                        pad_to_max_length=True, return_tensors='pt')
+                                       max_length=256, truncation='longest_first',
+                                       pad_to_max_length=True, return_tensors='pt')
         text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
                 encode['token_type_ids'].squeeze(0))
         if not self.test:
