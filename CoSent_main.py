@@ -6,7 +6,9 @@ from CoSent import *
 import numpy as np
 from torch.utils.data import Dataset
 import csv
+from transformers import get_linear_schedule_with_warmup
 
+Epoch = 5
 batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -24,19 +26,20 @@ class TextDataset(Dataset):
     def __getitem__(self, item):
         t1 = self.text[item]
         t2 = self.text2[item]
-        if len(t1) > 200:
-            t1 = t1[:200]
-        if len(t2) > 200:
-            t2 = t2[:200]
-        encode = tokenizer.encode_plus(t1, t2, add_special_tokens=True,
-                                        max_length=256, truncation='longest_first',
+        encode1 = tokenizer.encode_plus(t1, add_special_tokens=True,
+                                        max_length=256, truncation=True,
                                         pad_to_max_length=True, return_tensors='pt')
-        text = (encode['input_ids'].squeeze(0), encode['attention_mask'].squeeze(0),
-                encode['token_type_ids'].squeeze(0))
+        encode2 = tokenizer.encode_plus(t2, add_special_tokens=True,
+                                       max_length=256, truncation=True,
+                                       pad_to_max_length=True, return_tensors='pt')
+        text1 = (encode1['input_ids'].squeeze(0), encode1['attention_mask'].squeeze(0),
+                encode1['token_type_ids'].squeeze(0))
+        text2 = (encode2['input_ids'].squeeze(0), encode2['attention_mask'].squeeze(0),
+                encode2['token_type_ids'].squeeze(0))
         if not self.test:
-            return text, self.label[item]
+            return text1, text2, self.label[item]
         else:
-            return text, []
+            return text1, text2, []
 
 
 def compute_sim(y_pred1, y_pred2):
@@ -47,6 +50,18 @@ def compute_sim(y_pred1, y_pred2):
 
     sim = torch.sum(y_pred1 * y_pred2, dim=1)
     return sim
+
+
+def compute_loss(y_true, y_sim):
+    y_sim = y_sim * 20
+    y_sim = y_sim[:, None] - y_sim[None, :]
+    y_true = y_true[:, None] < y_true[None, :]
+    y_true = y_true.float()
+    y_sim = y_sim - (1 - y_true) * 1e12
+    y_sim = y_sim.view(-1)
+    y_sim = torch.cat((torch.tensor([0]).float().cuda(), y_sim), dim=0)
+
+    return torch.logsumexp(y_sim, dim=0)
 
 
 def main():
@@ -104,50 +119,96 @@ def main():
             'weight_decay': 0.0
         }
     ]
+    total_steps = len(train_loader) * Epoch
     optimizer = optim.AdamW(optimizer_grouped_parameters, lr=2e-5)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.85, patience=0)
-    criterion = nn.CrossEntropyLoss().to(device)
+    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
+                                                num_training_steps=total_steps)
+    # criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(5):
+    for epoch in range(Epoch):
         print_avg_loss = 0
-        for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
+        for batch_idx, ((x, mx, tx), (x2, mx2, tx2), label) in enumerate(train_loader):
             x = x.to(device)
             mx = mx.to(device)
             tx = tx.to(device)
+            x2 = x2.to(device)
+            mx2 = mx2.to(device)
+            tx2 = tx2.to(device)
             label = label.to(device)
             optimizer.zero_grad()
-            outputs, _ = model(x, mx, tx)
-            loss = criterion(outputs, label)
+            out1 = model(x, mx, tx)
+            out2 = model(x2, mx2, tx2)
+            sim = compute_sim(out1, out2)
+            loss = compute_loss(label, sim)
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
             optimizer.step()
             print_avg_loss += loss.item()
-        scheduler.step(print_avg_loss)
+        scheduler.step()
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
+
+    # find best threshold
+    model.eval()
+    preds = np.array([])
+    trues = np.array([])
+    with torch.no_grad():
+        for batch_idx, ((x, mx, tx), (x2, mx2, tx2), label) in enumerate(train_loader):
+            x = x.to(device)
+            mx = mx.to(device)
+            tx = tx.to(device)
+            x2 = x2.to(device)
+            mx2 = mx2.to(device)
+            tx2 = tx2.to(device)
+            out1 = model(x, mx, tx)
+            out2 = model(x2, mx2, tx2)
+            sim = compute_sim(out1, out2)
+            preds = np.append(preds, sim.cpu().numpy())
+            trues = np.append(trues, label.cpu().numpy())
+
+    max_acc = 0
+    threshold = 0
+    for i in range(20, 80):
+        th = i / 100.0
+        acc = 0
+        for j in range(len(preds)):
+            if preds[j] >= th:
+                acc += int(1 == trues[j])
+            else:
+                acc += int(0 == trues[j])
+        if acc > max_acc:
+            max_acc = acc
+            threshold = th
+    print(threshold)
 
     # test
     model.eval()
     preds = np.array([])
     with torch.no_grad():
-        for batch_idx, ((x, mx, tx), _) in enumerate(test_loader):
+        for batch_idx, ((x, mx, tx), (x2, mx2, tx2), _) in enumerate(test_loader):
             x = x.to(device)
             mx = mx.to(device)
             tx = tx.to(device)
-            output, _ = model(x, mx, tx)
-            prob = F.softmax(output, dim=1)
-            conf, pred = prob.max(1)
-            preds = np.append(preds, pred.cpu().numpy())
-    preds = preds.astype(int)
+            x2 = x2.to(device)
+            mx2 = mx2.to(device)
+            tx2 = tx2.to(device)
+            out1 = model(x, mx, tx)
+            out2 = model(x2, mx2, tx2)
+            sim = compute_sim(out1, out2)
+            preds = np.append(preds, sim.cpu().numpy())
+    preds = preds.astype(float)
 
     # output
     writer = csv.writer(open("submission.csv", "w", encoding="utf-8"))
     writer.writerow(("Id", "Category"))
     for i in range(len(preds)):
-        writer.writerow((i, preds[i]))
+        if preds[i] >= threshold:
+            writer.writerow((i, 1))
+        else:
+            writer.writerow((i, 0))
 
 
 if __name__ == '__main__':
