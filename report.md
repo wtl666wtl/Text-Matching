@@ -13,6 +13,8 @@
 
 BERT[1] 是一个
 
+RoBERTa[2]
+
 ## My Implement
 
 
@@ -25,6 +27,16 @@ BERT[1] 是一个
 
 然后我在此基础上进一步优化，首先增加了Data Preprocessing中数据增强的手段，同时在linear层之前增加了一个dropout层，进行这些改动后提升较为显著，表现达到了80.088%。
 
+之后使用RoBERTa替换BERT，并选用更小的batch_size增加随机性，使用不断调整的learning_rate等手段，将表现提升到了86.725%。
+
+整体表现如下表所示：
+
+|   Method    |  BERT   | BERT (with data augmentation) | RoBERTa (with more tricks) | CoSent |
+| :---------: | :-----: | :---------------------------: | :------------------------: | :----: |
+| Performance | 73.451% |            80.088%            |          86.725%           |        |
+
+
+
 ## Conclusion
 
 
@@ -32,3 +44,5 @@ BERT[1] 是一个
 ## Reference
 
 [1] Devlin J, Chang M W, Lee K, et al. Bert: Pre-training of deep bidirectional transformers for language understanding[J]. arXiv preprint arXiv:1810.04805, 2018.
+
+[2] Liu Y, Ott M, Goyal N, et al. Roberta: A robustly optimized bert pretraining approach[J]. arXiv preprint arXiv:1907.11692, 2019.

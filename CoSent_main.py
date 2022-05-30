@@ -145,7 +145,7 @@ def main():
             sim = compute_sim(out1, out2)
             loss = compute_loss(label, sim)
             loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
+            # nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
             optimizer.step()
             print_avg_loss += loss.item()
         scheduler.step()
@@ -202,7 +202,7 @@ def main():
     preds = preds.astype(float)
 
     # output
-    writer = csv.writer(open("submission.csv", "w", encoding="utf-8"))
+    writer = csv.writer(open("CoSent_submission.csv", "w", encoding="utf-8"))
     writer.writerow(("Id", "Category"))
     for i in range(len(preds)):
         if preds[i] >= threshold:

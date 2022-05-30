@@ -7,5 +7,5 @@ I used python=3.7, torch=1.10.0, cudatoolkit=11.1.
 ### Run
 You can modify the train/test data in "train.tsv"/"test.tsv".
 
-Run `python main.py`.
+Run `python main.py` (default model is RoBERTa).
 Results will be saved under "./submission.csv"
