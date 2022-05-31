@@ -19,4 +19,4 @@ class RoBERTa_model(nn.Module):
         hidden = torch.mean(hidden[-1], dim=1)
         output = torch.cat((pooled, hidden), dim=1)
         linear_output = self.dense(self.dropout(output))
-        return linear_output, pooled
+        return linear_output, output
