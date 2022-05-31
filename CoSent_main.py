@@ -147,8 +147,8 @@ def main():
             loss.backward()
             # nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
             optimizer.step()
+            scheduler.step()
             print_avg_loss += loss.item()
-        scheduler.step()
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
 
     # find best threshold
