@@ -80,7 +80,7 @@ def main():
     train_set = TextDataset(test=False, text=train_text, text2=train_text2, label=label)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=1)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True,
-                                               num_workers=8, drop_last=True)
+                                               num_workers=4, drop_last=True)
     device = torch.device('cuda')
     model = RoBERTa_model(2).to(device)
     #model = Bert_model(2).to(device)
@@ -104,7 +104,7 @@ def main():
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(10):
+    for epoch in range(5):
         print_avg_loss = 0
         for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
             x = x.to(device)
