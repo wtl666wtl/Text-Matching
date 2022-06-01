@@ -122,7 +122,7 @@ def main():
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=20.0)
             optimizer.step()
             print_avg_loss += loss.item()
-        scheduler.step(print_avg_loss)
+            scheduler.step(print_avg_loss)
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
 
     # test
