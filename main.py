@@ -58,7 +58,7 @@ def main():
             train_text.append(t2)
             train_text2.append(t1)
             label.append(int(l))
-            #"""
+            """
             train_text.append(t1)
             train_text2.append(t1)
             label.append(1)
@@ -71,7 +71,7 @@ def main():
             train_text.append(t2)
             train_text2.append(train_text[random.randint(0, len(train_text)-5)])
             label.append(0)
-            #"""
+            """
     reader = csv.reader(open("test.tsv", "r", encoding="utf-8"), delimiter='\t')
     for id, t1, t2 in reader:
         if not id.isalpha():
