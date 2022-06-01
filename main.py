@@ -7,7 +7,9 @@ from RoBERTa import *
 import numpy as np
 from torch.utils.data import Dataset
 import csv
+from transformers import get_linear_schedule_with_warmup
 
+Epoch = 8
 batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -96,15 +98,17 @@ def main():
             'weight_decay': 0.0
         }
     ]
+    total_steps = len(train_loader) * Epoch
     optimizer = optim.AdamW(optimizer_grouped_parameters, lr=2e-5)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.85, patience=0)
+    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
+                                                num_training_steps=total_steps)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
     # train
     batch_count = len(train_text) // batch_size
     model.train()
-    for epoch in range(5):
+    for epoch in range(Epoch):
         print_avg_loss = 0
         for batch_idx, ((x, mx, tx), label) in enumerate(train_loader):
             x = x.to(device)
@@ -115,7 +119,7 @@ def main():
             outputs, _ = model(x, mx, tx)
             loss = criterion(outputs, label)
             loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=20.0)
             optimizer.step()
             print_avg_loss += loss.item()
         scheduler.step(print_avg_loss)
