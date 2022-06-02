@@ -100,8 +100,9 @@ def main():
     ]
     total_steps = len(train_loader) * Epoch
     optimizer = optim.AdamW(optimizer_grouped_parameters, lr=2e-5)
-    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
-                                                num_training_steps=total_steps)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.85, patience=0)
+    #scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
+    #                                            num_training_steps=total_steps)
     criterion = nn.CrossEntropyLoss().to(device)
     print("Start training!")
 
@@ -119,10 +120,10 @@ def main():
             outputs, _ = model(x, mx, tx)
             loss = criterion(outputs, label)
             loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), max_norm=20.0)
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
             optimizer.step()
             print_avg_loss += loss.item()
-            scheduler.step()
+        scheduler.step(loss)
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
 
     # test
