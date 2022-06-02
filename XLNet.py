@@ -9,7 +9,7 @@ class XLNet(nn.Module):
     def __init__(self, k):
         super(XLNet, self).__init__()
         self.bert = model_class.from_pretrained(pretrained_weights)
-        for name, param in self.net.named_parameters():
+        for name, param in self.bert.named_parameters():
             if 'layer.11' in name or 'layer.10' in name or 'layer.9' in name or 'layer.8' in name or 'pooler.dense' in name:
                 param.requires_grad = True
             else:
