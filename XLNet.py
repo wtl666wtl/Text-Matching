@@ -18,6 +18,6 @@ class XLNet(nn.Module):
         self.dense = nn.Linear(768, k)
 
     def forward(self, input_ids, attention_mask, token_type_ids):
-        last_hidden = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, output_all_encoded_layers=False).last_hidden_state
+        last_hidden, mems = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         linear_output = self.dense(torch.max(self.dropout(last_hidden), dim=1)[0])
         return linear_output, last_hidden
