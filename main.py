@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import csv
 from transformers import get_linear_schedule_with_warmup
 
-Epoch = 5
+Epoch = 3
 batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
