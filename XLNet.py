@@ -20,6 +20,6 @@ class XLNet(nn.Module):
     def forward(self, input_ids, attention_mask, token_type_ids):
         output_tokens = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)[0]
         cls_tokens = output_tokens[:, 0, :]
-        print(cls_tokens.tokens.size())
+        print(cls_tokens.size())
         linear_output = self.dense(torch.max(self.dropout(cls_tokens), dim=1)[0])
         return linear_output, cls_tokens
