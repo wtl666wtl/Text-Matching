@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import csv
 from transformers import get_linear_schedule_with_warmup
 
-Epoch = 3
+Epoch = 4
 batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -123,7 +123,7 @@ def main():
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
             optimizer.step()
             print_avg_loss += loss.item()
-        scheduler.step(loss)
+        scheduler.step(print_avg_loss)
         print("Epoch: %d, Loss: %.4f" % ((epoch + 1), print_avg_loss / batch_count))
 
     # test

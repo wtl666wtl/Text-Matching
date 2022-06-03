@@ -12,12 +12,11 @@ class RoBERTa_model(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = True
         self.dropout = nn.Dropout(p=0.2)
-        self.dense = nn.Linear(768 * 3, k)
+        self.dense = nn.Linear(768 * 2, k)
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         _, pooled, hidden = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        seq_avg = torch.mean(_, dim=1)
         hidden = torch.mean(hidden[-1], dim=1)
-        output = torch.cat((pooled, hidden, seq_avg), dim=1)
+        output = torch.cat((pooled, hidden), dim=1)
         linear_output = self.dense(self.dropout(output))
         return linear_output, output
