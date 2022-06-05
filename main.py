@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import csv
 from transformers import get_linear_schedule_with_warmup
 
-Epoch = 4
+Epoch = 3
 batch_size = 32
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -99,7 +99,7 @@ def main():
         }
     ]
     total_steps = len(train_loader) * Epoch
-    optimizer = optim.AdamW(optimizer_grouped_parameters, lr=2e-5)
+    optimizer = optim.AdamW(optimizer_grouped_parameters, lr=2.5e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.85, patience=0)
     #scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
     #                                            num_training_steps=total_steps)
